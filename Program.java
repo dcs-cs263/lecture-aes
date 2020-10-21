@@ -18,11 +18,42 @@ public class Program {
         byte[] keyBytes = new byte[32];
         secureRandom.nextBytes(keyBytes);
 
-        byte[] iv = new byte[16];
-        secureRandom.nextBytes(iv);
-
         try {
-            AES aes = new AES(keyBytes, iv);
+            while(true) {
+                System.out.print("Plaintext: ");
+                String text = System.console().readLine();
+
+                byte[] iv = new byte[16];
+                secureRandom.nextBytes(iv);
+
+                AES aes = new AES(keyBytes, iv);
+
+                byte[] ciphertextECB = aes.encryptECB(text);
+                System.out.printf(
+                    "Ciphertext (ECB): %s\n", 
+                    toBase64(ciphertextECB)
+                );
+
+                String decryptedPlaintextECB = aes.decryptECB(ciphertextECB);
+                System.out.printf(
+                    "Decrypted plaintext (ECB): %s\n", 
+                    decryptedPlaintextECB
+                );
+
+                byte[] ciphertextCBC = aes.encryptCBC(text);
+                System.out.printf(
+                    "Ciphertext (CBC): %s\n", 
+                    toBase64(ciphertextCBC)
+                );
+
+                String decryptedPlaintextCBC = aes.decryptCBC(ciphertextCBC);
+                System.out.printf(
+                    "Decrypted plaintext (CBC): %s\n", 
+                    decryptedPlaintextCBC
+                );
+
+                System.out.println();
+            }
         }
         catch(Exception ex) {
             ex.printStackTrace();

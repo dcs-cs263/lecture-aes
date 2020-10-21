@@ -1,6 +1,6 @@
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AES
@@ -14,22 +14,40 @@ public class AES
         this.iv = iv;
     }
 
-    public byte[] encrypt(String plainText) throws Exception
+    public byte[] encryptCBC(String plainText) throws Exception
     {
         SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
-        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        GCMParameterSpec spec = new GCMParameterSpec(128, this.iv);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        IvParameterSpec spec = new IvParameterSpec(iv);
         cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
 
         return cipher.doFinal(plainText.getBytes());
     }
 
-    public String decrypt(byte[] cipherBytes) throws Exception
+    public String decryptCBC(byte[] cipherBytes) throws Exception
     {
         SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
-        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
-        GCMParameterSpec spec = new GCMParameterSpec(128, this.iv);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        IvParameterSpec spec = new IvParameterSpec(this.iv);
         cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+
+        return new String(cipher.doFinal(cipherBytes));
+    }
+
+    public byte[] encryptECB(String plainText) throws Exception
+    {
+        SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+
+        return cipher.doFinal(plainText.getBytes());
+    }
+
+    public String decryptECB(byte[] cipherBytes) throws Exception
+    {
+        SecretKeySpec secretKey = new SecretKeySpec(key, "AES");
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
 
         return new String(cipher.doFinal(cipherBytes));
     }
